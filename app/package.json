@@ -49,5 +49,6 @@
     "eslint-plugin-react": "^7.21.5",
     "node-sass": "^4.0.0",
     "typescript": "^4.0.5"
-  }
+  },
+  "proxy": "http://192.168.178.160:8080"
 }
