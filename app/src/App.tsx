@@ -21,11 +21,12 @@ function App() {
 
     var data = new FormData()
     data.append('image', dataURItoBlob(img), 'image.bmp')
+    //data.append('file', 'test')
     let response = await fetch(`${apiAdress}/save/${name}`, {
       method: 'POST',
       body: data,
       headers: {
-        'Content-Type': 'multipart/form-data'
+        //'Content-Type': 'multipart/form-data'
       },
     })
     console.log(response)
