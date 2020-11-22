@@ -8,6 +8,8 @@ import './styles/App.css'
 
 const apiAdress = ''
 
+let next_number: string = '0'
+
 function App() {
 
   const history = useHistory()
@@ -22,14 +24,16 @@ function App() {
     var data = new FormData()
     data.append('image', dataURItoBlob(img), 'image.bmp')
     //data.append('file', 'test')
-    let response = await fetch(`${apiAdress}/save/${name}`, {
+    let response = await fetch(`${apiAdress}/save/${name}/${next_number}`, {
       method: 'POST',
       body: data,
       headers: {
         //'Content-Type': 'multipart/form-data'
       },
-    })
+    }).then(response=>response.json())
+    
     console.log(response)
+    next_number = response.next_number
   }
 
   return (
