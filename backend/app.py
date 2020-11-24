@@ -38,9 +38,13 @@ HOST = '0.0.0.0'
 
 """ ################### """
 
+
+
 """ ##### BEGIN FUNCTIONS ##### """
 
 def get_next_random_num(user: str):
+
+	global data_stats
 	
 	user_stats = data_stats[data_stats.user == user]
 
@@ -52,7 +56,23 @@ def get_next_random_num(user: str):
 
 	return random.choice(non_full_classes)
 
+
+def create_new_user(user: str):
+
+	global data_stats
+
+	os.mkdir(f'{DATA_FOLDER}/{user}')
+
+	for _cls in classes:
+		os.mkdir(f'{DATA_FOLDER}/{user}/{_cls}')
+
+	data_stats = data_stats.append({'user':user,
+		'0':0, '1':0, '2':0, '3':0, '4':0, '5':0, '6':0, '7':0, '8':0, '9':0},
+		ignore_index=True)
+
 """ ##### END FUNCTIONS ##### """
+
+
 
 @app.route('/new_user', methods=['GET'])
 def new_user():
@@ -70,22 +90,7 @@ def new_user():
 	global data_stats
 
 	if user not in list(data_stats.user):
-		os.mkdir(f'{DATA_FOLDER}/{user}')
-
-		for cls in classes:
-			os.mkdir(f'{DATA_FOLDER}/{user}/{cls}')
-
-		data_stats = data_stats.append({'user':user, 
-			'0':0,
-			'1':0,
-			'2':0,
-			'3':0,
-			'4':0,
-			'5':0,
-			'6':0,
-			'7':0,
-			'8':0,
-			'9':0}, ignore_index=True)
+		create_new_user(user)
 
 	response = jsonify(data_stats[data_stats.user == user].to_dict('records')[0])
 	response.status = '200'
@@ -108,23 +113,7 @@ def save(user, img_cls):
 	global data_stats
 
 	if user not in list(data_stats.user):
-		os.mkdir(f'{DATA_FOLDER}/{user}')
-
-		for cls in classes:
-			os.mkdir(f'{DATA_FOLDER}/{user}/{cls}')
-
-		data_stats = data_stats.append({'user':user, 
-			'0':0,
-			'1':0,
-			'2':0,
-			'3':0,
-			'4':0,
-			'5':0,
-			'6':0,
-			'7':0,
-			'8':0,
-			'9':0}, ignore_index=True)
-
+		create_new_user(user)
 
 	user_stats = data_stats[data_stats.user == user]
 	count = user_stats[img_cls].iloc[0]
@@ -155,23 +144,7 @@ def next_number(user):
 	global data_stats
 
 	if user not in list(data_stats.user):
-		os.mkdir(f'{DATA_FOLDER}/{user}')
-
-		for cls in classes:
-			os.mkdir(f'{DATA_FOLDER}/{user}/{cls}')
-
-		data_stats = data_stats.append({'user':user, 
-			'0':0,
-			'1':0,
-			'2':0,
-			'3':0,
-			'4':0,
-			'5':0,
-			'6':0,
-			'7':0,
-			'8':0,
-			'9':0}, ignore_index=True)
-
+		create_new_user(user)
 
 	next_number = get_next_random_num(user)
 	response = jsonify({'next_number':next_number, 'stats':data_stats[data_stats.user == user].to_dict('records')[0]})
