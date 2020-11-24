@@ -1,12 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Route, Switch, useHistory } from 'react-router-dom'
 import { LoginView } from './LoginView'
 import { TrainingView } from './TrainingView'
-import { dataURItoBlob } from './utils'
 
-import './styles/App.css'
-
-const apiAdress = ''
+import './styles/App.scss'
 
 function App() {
 
@@ -16,30 +13,11 @@ function App() {
     history.push(name)
   }
 
-  async function postImage(img: string, name: string) {
-    console.log([img, name])
-
-    try {
-      var data = new FormData()
-      data.append('image', dataURItoBlob(img), 'image.bmp')
-      let response = await fetch(`${apiAdress}/save/${name}`, {
-        method: 'POST',
-        body: data,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-      })
-      console.log(response)
-    } catch (err) {
-      console.warn(err)
-    }
-  }
-
   return (
     <div className="App">
       <Switch>
         <Route path='/:username'>
-          <TrainingView onNewImage={(img, name) => postImage(img, name)}/>
+          <TrainingView/>
         </Route>
         <Route path='/'>
           <LoginView onLogin={(name) => onLogin(name)}/>
