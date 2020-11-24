@@ -38,7 +38,7 @@ class Api {
     })
   }
   
-  static async getNumber(user: string) : Promise<number> {
+  static async getNumber(user: string) : Promise<{ digit: number, total: number, current: number}> {
     let response = await fetch(`${this.apiAdress}/next_number/${user}`, {
       method: 'GET',
       headers: {
@@ -46,8 +46,7 @@ class Api {
       },
     })
     const json = await response.json()
-    console.log(json)
-    return json['next_number']
+    return { digit : json['next_number'], total : json['max_needed'], current: json['current_count']}
   }
 }
 

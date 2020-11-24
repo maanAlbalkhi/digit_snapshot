@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Subject, concat, of } from 'rxjs'
-import { takeUntil, switchMap, map, pairwise } from 'rxjs/operators'
+import { takeUntil, switchMap, map, pairwise, take } from 'rxjs/operators'
 
 type TouchEvent = React.TouchEvent<HTMLCanvasElement>
 
@@ -25,7 +25,7 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
   const [ $touchMove ] = useState(new Subject<TouchEvent>())
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const [ startTime, setStartTime ] = useState(0)
+  const [ resetTime, setResetTime ] = useState<boolean>(false)
 
   // subscribe to touchEvents
   useEffect( () => {
@@ -40,8 +40,11 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
     // get drawing canvas
     const ctx = canvasRef.current?.getContext('2d')
 
+    var startTime = 0
+
     const moveSubscription = $canvasTouchStart.pipe(
       switchMap((start) => {
+        if (startTime == 0) startTime = Date.now()
         return concat(
           of(start), // take the last touchstart event
           $canvasTouchMove // then take all move events
@@ -49,18 +52,20 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
       }),
     ).subscribe( ([prev, curr]) => {
       if (!ctx || !prev || !curr) return
-      drawTouchLine(prev, curr, ctx)
+      const elapsed = Date.now() - startTime 
+      drawTouchLine(prev, curr, elapsed, ctx)
     })
     return () => {
       moveSubscription.unsubscribe()
     }
-  }, [canvasRef])
+  }, [canvasRef, resetTime])
 
-  function drawTouchLine(prev: CanvasTouchEvent, curr: CanvasTouchEvent, ctx: CanvasRenderingContext2D) {
+  function drawTouchLine(prev: CanvasTouchEvent, curr: CanvasTouchEvent, time: number, ctx: CanvasRenderingContext2D) {
     const force = 255 - curr.force * 255
+    const [ r, g, b ] = [ force, time % 256, Math.floor(time / 256) ]
     ctx.beginPath()
     ctx.lineWidth = 4
-    ctx.strokeStyle = `rgb(${force},${force},${force})`
+    ctx.strokeStyle = `rgb(${r},${g},${b})`
     ctx.moveTo(prev.x, prev.y)
     ctx.lineTo(curr.x, curr.y)
     ctx.stroke()
@@ -71,6 +76,7 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
     const h = canvasRef.current?.height || 0
     const w = canvasRef.current?.width || 0
     ctx?.clearRect(0, 0, w, h)
+    setResetTime(!resetTime)
   }
 
   function submitCanvas() {
@@ -91,6 +97,7 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
     onSubmitCanvas(tmpCanvas.toDataURL())
   }
 
+  // clear canvas when clear changed
   useEffect(() => {
     clearCanvas()
   },[clear])

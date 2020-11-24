@@ -27,13 +27,16 @@ function mapTouchEvent(e : TouchEvent, canvas: HTMLCanvasElement|null) : CanvasT
 function TrainingView() {
   const [ digit, setDigit ] = useState<number>()
   const [ clearCanvas, setClearCanvas ] = useState(false)
+  const [ progress, setProgress ] = useState({ total: 1, finished: 0 })
 
   const { username } = useParams<{ username: string}>()
+  
 
   async function requestNextDigit(user: string) {
     try {
-      const digit = await Api.getNumber(user)
-      setDigit(digit)
+      const response = await Api.getNumber(user)
+      setDigit(response.digit)
+      setProgress({ total: response.total, finished: response.current })
     } catch (err) {
       console.error(err)
     }
@@ -59,7 +62,7 @@ function TrainingView() {
     <div className="training-view">
       <h1>Training</h1>
       <div className='flex-center'>
-        <ProgressBar total={100} finished={67}/>
+        <ProgressBar total={progress.total} finished={progress.finished}/>
         <p>Draw Digit: {digit}</p>
         <CanvasView clear={clearCanvas} onSubmitCanvas={submitCanvas}/>
       </div>
