@@ -103,7 +103,28 @@ def save(user, img_cls):
 	if not img_cls:
 		response = jsonify({'message':'no image class provided'})
 		response.status = '400'
-		return response	
+		return response
+
+	global data_stats
+
+	if user not in list(data_stats.user):
+		os.mkdir(f'{DATA_FOLDER}/{user}')
+
+		for cls in classes:
+			os.mkdir(f'{DATA_FOLDER}/{user}/{cls}')
+
+		data_stats = data_stats.append({'user':user, 
+			'0':0,
+			'1':0,
+			'2':0,
+			'3':0,
+			'4':0,
+			'5':0,
+			'6':0,
+			'7':0,
+			'8':0,
+			'9':0}, ignore_index=True)
+
 
 	user_stats = data_stats[data_stats.user == user]
 	count = user_stats[img_cls].iloc[0]
@@ -117,7 +138,7 @@ def save(user, img_cls):
 	data_stats.at[user_stats.index[0], img_cls] = count + 1
 
 	next_number = get_next_random_num(user)
-	response = jsonify({'next_number':next_number})
+	response = jsonify({'next_number':next_number, 'stats':data_stats[data_stats.user == user].to_dict('records')[0]})
 	response.status = '200'
 	
 	return response
@@ -131,8 +152,29 @@ def next_number(user):
 		response.status = '400'
 		return response
 
+	global data_stats
+
+	if user not in list(data_stats.user):
+		os.mkdir(f'{DATA_FOLDER}/{user}')
+
+		for cls in classes:
+			os.mkdir(f'{DATA_FOLDER}/{user}/{cls}')
+
+		data_stats = data_stats.append({'user':user, 
+			'0':0,
+			'1':0,
+			'2':0,
+			'3':0,
+			'4':0,
+			'5':0,
+			'6':0,
+			'7':0,
+			'8':0,
+			'9':0}, ignore_index=True)
+
+
 	next_number = get_next_random_num(user)
-	response = jsonify({'next_number':next_number})
+	response = jsonify({'next_number':next_number, 'stats':data_stats[data_stats.user == user].to_dict('records')[0]})
 	response.status = '200'
 	
 	return response
