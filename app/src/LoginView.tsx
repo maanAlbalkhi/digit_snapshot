@@ -10,6 +10,10 @@ function LoginView({onLogin} : {onLogin : (name : string) => void}) {
     onLogin(`${name.first}_${name.last}`)
   }
 
+  function replaceNonAscii(text: string) {
+    return text.replace(/[^A-Za-z]/ig, '').toLocaleLowerCase()
+  }
+
   // set name on load
   useEffect(() => {
     setName({
@@ -23,10 +27,20 @@ function LoginView({onLogin} : {onLogin : (name : string) => void}) {
       <h1>Login</h1>
       <div>
         <div className='input-element'>
-          <input type='text' placeholder='First Name' value={name.first} onChange={(e) => setName({ ...name, first: e.target.value })}></input>
+          <input 
+            type='text' 
+            placeholder='First Name' 
+            pattern="[A-Za-z]{3}" 
+            value={name.first} 
+            onChange={(e) => setName({ ...name, first: replaceNonAscii(e.target.value) })}/>
         </div>
         <div className='input-element'>
-          <input type='text' placeholder='Last Name' value={name.last} onChange={(e) => setName({ ...name, last: e.target.value })}></input>
+          <input 
+            type='text' 
+            placeholder='Last Name' 
+            pattern="[A-Za-z]{3}" 
+            value={name.last} 
+            onChange={(e) => setName({ ...name, last: replaceNonAscii(e.target.value) })}/>
         </div>
         <button onClick={() => onLoginClicked()}>Login</button>
       </div>
