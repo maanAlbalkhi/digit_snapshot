@@ -10,6 +10,7 @@ from flask import Flask, request, jsonify
 
 DATA_FOLDER = '../../data'
 MAX_COUNT_PER_DIGIT = 100
+MAX_COUNT_ALL = MAX_COUNT_PER_DIGIT * 10
 IMAGE_PREFIX = 'png'
 
 classes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -70,6 +71,17 @@ def create_new_user(user: str):
 		'0':0, '1':0, '2':0, '3':0, '4':0, '5':0, '6':0, '7':0, '8':0, '9':0},
 		ignore_index=True)
 
+
+def calculate_count(user: str):
+	global data_stats
+
+	user_dict = data_stats[data_stats.user == user].to_dict('records')[0]
+	count = 0
+	for _cls in classes:
+    	count += user_dict[_cls]
+
+    return count
+
 """ ##### END FUNCTIONS ##### """
 
 
@@ -127,7 +139,7 @@ def save(user, img_cls):
 	data_stats.at[user_stats.index[0], img_cls] = count + 1
 
 	next_number = get_next_random_num(user)
-	response = jsonify({'next_number':next_number, 'stats':data_stats[data_stats.user == user].to_dict('records')[0]})
+	response = jsonify({'next_number':next_number, 'current_count':calculate_count(user), 'max_needed':MAX_COUNT_ALL})
 	response.status = '200'
 	
 	return response
@@ -147,7 +159,7 @@ def next_number(user):
 		create_new_user(user)
 
 	next_number = get_next_random_num(user)
-	response = jsonify({'next_number':next_number, 'stats':data_stats[data_stats.user == user].to_dict('records')[0]})
+	response = jsonify({'next_number':next_number, 'current_count':calculate_count(user), 'max_needed':MAX_COUNT_ALL})
 	response.status = '200'
 	
 	return response
