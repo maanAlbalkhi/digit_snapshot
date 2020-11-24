@@ -19,16 +19,20 @@ function App() {
   async function postImage(img: string, name: string) {
     console.log([img, name])
 
-    var data = new FormData()
-    data.append('image', dataURItoBlob(img), 'image.bmp')
-    let response = await fetch(`${apiAdress}/save/${name}`, {
-      method: 'POST',
-      body: data,
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-    })
-    console.log(response)
+    try {
+      var data = new FormData()
+      data.append('image', dataURItoBlob(img), 'image.bmp')
+      let response = await fetch(`${apiAdress}/save/${name}`, {
+        method: 'POST',
+        body: data,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+      })
+      console.log(response)
+    } catch (err) {
+      console.warn(err)
+    }
   }
 
   return (
