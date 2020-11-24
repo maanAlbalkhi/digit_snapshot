@@ -78,9 +78,9 @@ def calculate_count(user: str):
 	user_dict = data_stats[data_stats.user == user].to_dict('records')[0]
 	count = 0
 	for _cls in classes:
-    	count += user_dict[_cls]
+		count += user_dict[_cls]
 
-    return count
+	return count
 
 """ ##### END FUNCTIONS ##### """
 
