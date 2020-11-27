@@ -1,0 +1,31 @@
+.canvas-view {
+
+  .submit-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    min-width: 0px;
+    background-color: green;
+    margin: 30px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .clear-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    min-width: 0px;
+    background-color: red;
+    margin: 30px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  
+}

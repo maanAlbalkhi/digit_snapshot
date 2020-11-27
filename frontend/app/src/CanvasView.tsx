@@ -2,6 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Subject, concat, of } from 'rxjs'
 import { takeUntil, switchMap, map, pairwise, take } from 'rxjs/operators'
 
+import { ReactComponent as SubmitImage } from './assets/done-24px.svg'
+import { ReactComponent as ClearImage } from './assets/clear-24px.svg'
+
+import './styles/CanvasView.scss'
+
 type TouchEvent = React.TouchEvent<HTMLCanvasElement>
 
 type CanvasTouchEvent = {
@@ -119,7 +124,7 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
   },[clear])
 
   return(
-    <div>
+    <div className='canvas-view'>
       <canvas id='canvas' ref={canvasRef} width={256} height={256}
         onTouchStart={(e) => $touchStart.next(e)}
         onTouchEnd={(e) => $touchEnd.next(e)}
@@ -127,8 +132,8 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
         onContextMenu={() => false}>
       </canvas>
 
-      <button onClick={() => clearCanvas()}>Clear</button>
-      <button onClick={() => submitCanvas()}>Submit</button>
+      <button className='clear-button' onClick={() => clearCanvas()}><ClearImage/></button>
+      <button className='submit-button' onClick={() => submitCanvas()}><SubmitImage/></button>
     </div>
   )
 }

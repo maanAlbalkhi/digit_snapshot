@@ -42,7 +42,7 @@ function TrainingView() {
 
   return (
     <div className="training-view">
-      <h1>Training</h1>
+      <h1>Drawing</h1>
       <div className='flex-center'>
         <ProgressBar total={progress.total} finished={progress.finished}/>
         <p>Draw Digit: {digit}</p>
