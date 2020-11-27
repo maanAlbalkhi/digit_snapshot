@@ -18,12 +18,14 @@ function mapTouchEvent(e : TouchEvent, canvas: HTMLCanvasElement|null) : CanvasT
   return { x: touch.pageX - offsetLeft, y: touch.pageY - offsetTop, force: touch.force} as CanvasTouchEvent
 }
 
-const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSubmitCanvas: (img: string) => void}) => {
+const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSubmitCanvas: (imgUri: string) => void}) => {
 
   const [ $touchStart ] = useState(new Subject<TouchEvent>())
   const [ $touchEnd ] = useState(new Subject<TouchEvent>())
   const [ $touchMove ] = useState(new Subject<TouchEvent>())
+
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [ dataCanvas, setDataCanvas ] = useState<HTMLCanvasElement>()
 
   const [ resetTime, setResetTime ] = useState<boolean>(false)
 
@@ -37,8 +39,20 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
     const $canvasTouchEnd = $touchEnd.pipe(map((e) => mapTouchEvent(e, canvasRef.current)))
     const $canvasTouchMove = $touchMove.pipe(map((e) => mapTouchEvent(e, canvasRef.current)))
 
-    // get drawing canvas
+    const h = canvasRef.current?.height || 0
+    const w = canvasRef.current?.width || 0
+
+    // get drawing canvas and clear it
     const ctx = canvasRef.current?.getContext('2d')
+    ctx?.clearRect(0, 0, w, h)
+    
+    // create invisible canvas
+    const canvas = document.createElement('canvas')
+    canvas.width = h
+    canvas.height = w
+    setDataCanvas(canvas)
+
+    const dataCtx = canvas.getContext('2d')
 
     var startTime = 0
 
@@ -51,50 +65,52 @@ const CanvasView = ({ clear = false, onSubmitCanvas } : { clear?: boolean, onSub
         ).pipe(pairwise(), takeUntil($canvasTouchEnd))
       }),
     ).subscribe( ([prev, curr]) => {
-      if (!ctx || !prev || !curr) return
+      if (!ctx || !dataCtx || !prev || !curr) return
       const elapsed = Date.now() - startTime 
-      drawTouchLine(prev, curr, elapsed, ctx)
+      drawTouchLine(prev, curr, elapsed, ctx, dataCtx)
     })
     return () => {
       moveSubscription.unsubscribe()
     }
   }, [canvasRef, resetTime])
 
-  function drawTouchLine(prev: CanvasTouchEvent, curr: CanvasTouchEvent, time: number, ctx: CanvasRenderingContext2D) {
+  function drawTouchLine(
+    prev: CanvasTouchEvent, 
+    curr: CanvasTouchEvent, 
+    time: number, 
+    drawCtx: CanvasRenderingContext2D, 
+    dataCtx: CanvasRenderingContext2D 
+  ) {
     const force = 255 - curr.force * 255
     const [ r, g, b ] = [ force, time % 256, Math.floor(time / 256) ]
-    ctx.beginPath()
-    ctx.lineWidth = 4
-    ctx.strokeStyle = `rgb(${r},${g},${b})`
-    ctx.moveTo(prev.x, prev.y)
-    ctx.lineTo(curr.x, curr.y)
-    ctx.stroke()
+    
+    // draw dataCtx
+    dataCtx.beginPath()
+    dataCtx.lineWidth = 4
+    dataCtx.strokeStyle = `rgb(${r},${g},${b})`
+    dataCtx.moveTo(prev.x, prev.y)
+    dataCtx.lineTo(curr.x, curr.y)
+    dataCtx.stroke()
+
+    // draw visible canvas
+    drawCtx.beginPath()
+    drawCtx.lineWidth = 4
+    drawCtx.strokeStyle = `rgb(${r},${r},${r})`
+    drawCtx.moveTo(prev.x, prev.y)
+    drawCtx.lineTo(curr.x, curr.y)
+    drawCtx.stroke()
   }
 
   function clearCanvas() {
-    const ctx = canvasRef.current?.getContext('2d')
-    const h = canvasRef.current?.height || 0
-    const w = canvasRef.current?.width || 0
-    ctx?.clearRect(0, 0, w, h)
     setResetTime(!resetTime)
   }
 
   function submitCanvas() {
-    const canvas = canvasRef.current
+    const canvas = dataCanvas
     if (!canvas)
-      throw new Error('Canvas does not exist')
+      throw new Error('Data Canvas does not exist')
 
-    const w = canvasRef.current?.width || 0
-    const h = canvasRef.current?.height || 0
-
-    // create temporay canvas
-    const tmpCanvas = document.createElement('canvas')
-    const ctx = tmpCanvas.getContext('2d')
-    tmpCanvas.width = w
-    tmpCanvas.height = h
-    ctx?.drawImage(canvas, 0, 0, w, h, 0, 0, w, h)
-
-    onSubmitCanvas(tmpCanvas.toDataURL())
+    onSubmitCanvas(canvas.toDataURL())
   }
 
   // clear canvas when clear changed

@@ -1,4 +1,3 @@
-import { clear } from 'console'
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Subject, concat, of } from 'rxjs'
@@ -8,29 +7,12 @@ import { CanvasView } from './CanvasView'
 import { ProgressBar } from './ProgressBar'
 import './styles/TrainingView.scss'
 
-type TouchEvent = React.TouchEvent<HTMLCanvasElement>
-
-type CanvasTouchEvent = {
-  x: number
-  y: number
-  force: number
-}
-
-function mapTouchEvent(e : TouchEvent, canvas: HTMLCanvasElement|null) : CanvasTouchEvent|undefined {
-  if (e.touches.length < 1) return 
-  const offsetTop = canvas?.offsetTop || 0
-  const offsetLeft = canvas?.offsetLeft || 0
-  const touch =  e.touches[0] as any
-  return { x: touch.pageX - offsetLeft, y: touch.pageY - offsetTop, force: touch.force} as CanvasTouchEvent
-}
-
 function TrainingView() {
   const [ digit, setDigit ] = useState<number>()
   const [ clearCanvas, setClearCanvas ] = useState(false)
   const [ progress, setProgress ] = useState({ total: 1, finished: 0 })
 
-  const { username } = useParams<{ username: string}>()
-  
+  const { username } = useParams<{ username: string}>()  
 
   async function requestNextDigit(user: string) {
     try {
@@ -42,9 +24,9 @@ function TrainingView() {
     }
   }
 
-  async function submitCanvas(img: string) {
+  async function submitCanvas(imgUri: string) {
     try {
-      await Api.postImage(img, username, digit ? digit : -1)
+      await Api.postImage(imgUri, username, digit ? digit : -1)
       setClearCanvas(!clearCanvas)
       setDigit(undefined)
     } catch (err) {
