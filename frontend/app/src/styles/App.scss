@@ -20,6 +20,7 @@ body,
 body {
   /* Sending body at the bottom of the stack */
   z-index: 1;
+  font-family: monospace;
 }
 
 .App {
@@ -34,6 +35,12 @@ body {
     min-width: 100px;
     margin: $standard-spacing;
     font-size: 100%;
+    color: white;
+    font-family: monospace;
+  }
+
+  input {
+    font-family: monospace;
   }
 
   h1 {

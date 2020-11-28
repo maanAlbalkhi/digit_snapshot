@@ -1,11 +1,13 @@
+$button-size: 70px;
+
 .canvas-view {
 
   .submit-button {
-    width: 60px;
-    height: 60px;
+    width: $button-size;
+    height: $button-size;
     border-radius: 50%;
     min-width: 0px;
-    background-color: green;
+    background-color: #C7F464;
     margin: 30px;
 
     svg {
@@ -15,11 +17,11 @@
   }
 
   .clear-button {
-    width: 60px;
-    height: 60px;
+    width: $button-size;
+    height: $button-size;
     border-radius: 50%;
     min-width: 0px;
-    background-color: red;
+    background-color: #FF6B6B;
     margin: 30px;
 
     svg {
