@@ -127,6 +127,16 @@ def save(user, img_cls):
 	if user not in list(data_stats.user):
 		create_new_user(user)
 
+
+	current_count = calculate_count(user)
+
+	if current_count == MAX_COUNT_ALL:
+		response = jsonify({'next_number':'THANK YOU, IT\'S DONE :D', 'current_count':current_count, 'max_needed':MAX_COUNT_ALL})
+		response.status = '200'
+	
+		return response
+
+
 	user_stats = data_stats[data_stats.user == user]
 	count = user_stats[img_cls].iloc[0]
 	save_path = f'{DATA_FOLDER}/{user}/{img_cls}/{count}.{IMAGE_PREFIX}'
@@ -139,7 +149,7 @@ def save(user, img_cls):
 	data_stats.at[user_stats.index[0], img_cls] = count + 1
 
 	next_number = get_next_random_num(user)
-	response = jsonify({'next_number':next_number, 'current_count':calculate_count(user), 'max_needed':MAX_COUNT_ALL})
+	response = jsonify({'next_number':next_number, 'current_count':current_count, 'max_needed':MAX_COUNT_ALL})
 	response.status = '200'
 	
 	return response
@@ -158,8 +168,14 @@ def next_number(user):
 	if user not in list(data_stats.user):
 		create_new_user(user)
 
-	next_number = get_next_random_num(user)
-	response = jsonify({'next_number':next_number, 'current_count':calculate_count(user), 'max_needed':MAX_COUNT_ALL})
+	current_count = calculate_count(user)
+
+	if current_count != MAX_COUNT_ALL:
+		next_number = get_next_random_num(user)
+	else:
+		next_number = 'THANK YOU, IT\'S DONE :D'
+
+	response = jsonify({'next_number':next_number, 'current_count':current_count, 'max_needed':MAX_COUNT_ALL})
 	response.status = '200'
 	
 	return response
