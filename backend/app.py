@@ -2,6 +2,8 @@ import os
 import io
 import random
 import pandas as pd
+import numpy as np
+import time
 
 from PIL import Image
 
@@ -144,11 +146,19 @@ def save(user, img_cls):
 	file = request.files['image']
 	# file.save(save_path)
 	img = Image.open(file.stream)
-	img.save(save_path, IMAGE_PREFIX)
 
-	data_stats.at[user_stats.index[0], img_cls] = count + 1
+	""" save the image if its not empty """
+	img = np.asarray(img)
+	if img[:, :, 3].mean() != 0:
+		img = Image.fromarray(img)
+		img.save(save_path, IMAGE_PREFIX)
+
+		data_stats.at[user_stats.index[0], img_cls] = count + 1
+		current_count += 1
+
 
 	next_number = get_next_random_num(user)
+	
 	response = jsonify({'next_number':next_number, 'current_count':current_count, 'max_needed':MAX_COUNT_ALL})
 	response.status = '200'
 	
