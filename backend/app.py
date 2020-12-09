@@ -15,6 +15,8 @@ MAX_COUNT_PER_DIGIT = 200
 MAX_COUNT_ALL = MAX_COUNT_PER_DIGIT * 10
 IMAGE_PREFIX = 'png'
 
+MAX_OVERFLOW_TIME_MULTIPLIER = 10
+
 classes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 columns = (['user'] + classes)
 
@@ -149,7 +151,7 @@ def save(user, img_cls):
 
 	""" save the image if its not empty """
 	img = np.asarray(img)
-	if img[:, :, 3].mean() != 0:
+	if img[:, :, 3].mean() != 0 and img[:, :, 2].max() <= MAX_OVERFLOW_TIME_MULTIPLIER:
 		img = Image.fromarray(img)
 		img.save(save_path, IMAGE_PREFIX)
 
