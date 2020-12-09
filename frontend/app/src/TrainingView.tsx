@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Subject, concat, of } from 'rxjs'
-import { takeUntil, switchMap, map, pairwise } from 'rxjs/operators'
 import { Api } from './api'
-import { CanvasView } from './CanvasView'
+import { CanvasView, TouchPointDataObject } from './CanvasView'
 import { ProgressBar } from './ProgressBar'
 import './styles/TrainingView.scss'
 
@@ -24,9 +22,11 @@ function TrainingView() {
     }
   }
 
-  async function submitCanvas(imgUri: string) {
+  async function submitCanvas(data: TouchPointDataObject) {
     try {
-      await Api.postImage(imgUri, username, digit ? digit : -1)
+      data.name = username
+      data.digit = digit ? digit : -1
+      await Api.postImage(data)
       setClearCanvas(!clearCanvas)
       setDigit(undefined)
     } catch (err) {

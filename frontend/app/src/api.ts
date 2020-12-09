@@ -1,3 +1,4 @@
+import { TouchPointDataObject } from './CanvasView'
 
 
 function dataURItoBlob(dataURI : string) {
@@ -24,14 +25,11 @@ class Api {
 
   static apiAdress : string = ''
 
-  static async postImage(img: string, name: string, digit: number) {
-    if (digit < 0 || digit > 9)
-      throw new Error('Digit out of range.')
-    var data = new FormData()
-    data.append('image', dataURItoBlob(img), 'image.bmp')
-    await fetch(`${this.apiAdress}/save/${name}/${digit}`, {
+  static async postImage(data : TouchPointDataObject) {
+    console.log(data)
+    await fetch(`${this.apiAdress}/save/${data.name}/${data.digit}`, {
       method: 'POST',
-      body: data,
+      body: JSON.stringify(data),
       headers: {
         // 'Content-Type': 'multipart/form-data'
       },
