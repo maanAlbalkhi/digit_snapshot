@@ -6,7 +6,7 @@ import pandas as pd
 from flask import Flask, request, jsonify
 
 
-DATA_FOLDER = '../../data_json'
+DATA_FOLDER = '../../data'
 MAX_COUNT_PER_DIGIT = 200
 MAX_COUNT_ALL = MAX_COUNT_PER_DIGIT * 10
 IMAGE_PREFIX = 'json'
