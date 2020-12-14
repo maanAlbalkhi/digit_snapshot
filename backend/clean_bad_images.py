@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # In[1]:
 
 
@@ -12,57 +9,47 @@ import numpy as np
 from PIL import Image
 
 
-# In[2]:
-
-
 WORKING_DIR = '/home/maan/BA/code'
 os.chdir(WORKING_DIR)
 
 ROOT_DIR= 'DATA/SERVER'
 DATA_DIR = f'{ROOT_DIR}/origin_data'
 
+MAX_OVERFLOW = 10
 
-# In[3]:
 
-
-empty_images = dict()
+bad_images = dict()
 
 for user in os.listdir(DATA_DIR):
     user_path = f'{DATA_DIR}/{user}'
     
-    user_empty_images = dict()
+    user_bad_images = dict()
     
     for _cls in os.listdir(user_path):
         cls_path = f'{user_path}/{_cls}'
         
-        cls_empty_images = []
+        cls_bad_images = []
         
         for file in os.listdir(cls_path):
             
             img = Image.open(f'{cls_path}/{file}')
             img = np.asarray(img)
-            img = img[:, :, 3]
             
-            if img.mean() == 0:
-                cls_empty_images.append(file)
+            if img[:, :, 3].mean() == 0 or img[:, :, 2].max() > MAX_OVERFLOW:
+                cls_bad_images.append(file)
         
-        if cls_empty_images:
-            user_empty_images[_cls] = cls_empty_images
+        if cls_bad_images:
+            user_bad_images[_cls] = cls_bad_images
     
-    if user_empty_images:
-        empty_images[user] = user_empty_images
+    if user_bad_images:
+        bad_images[user] = user_bad_images
 
 
-# In[4]:
+
+print(bad_images)
 
 
-print(empty_images)
-
-
-# In[5]:
-
-
-for user, classes in empty_images.items():
+for user, classes in bad_images.items():
     user_path = f'{DATA_DIR}/{user}'
     
     for _cls, images in classes.items():
