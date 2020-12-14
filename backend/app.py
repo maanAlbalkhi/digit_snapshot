@@ -1,19 +1,17 @@
 import os
-import io
+import json
 import random
 import pandas as pd
-import numpy as np
-import time
-
-from PIL import Image
 
 from flask import Flask, request, jsonify
 
 
-DATA_FOLDER = '../../data'
+DATA_FOLDER = '../../data_json'
 MAX_COUNT_PER_DIGIT = 200
 MAX_COUNT_ALL = MAX_COUNT_PER_DIGIT * 10
-IMAGE_PREFIX = 'png'
+IMAGE_PREFIX = 'json'
+
+MAX_TIME_NEEDED = 2500
 
 classes = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 columns = (['user'] + classes)
@@ -143,15 +141,13 @@ def save(user, img_cls):
 	count = user_stats[img_cls].iloc[0]
 	save_path = f'{DATA_FOLDER}/{user}/{img_cls}/{count}.{IMAGE_PREFIX}'
 
-	file = request.files['image']
-	# file.save(save_path)
-	img = Image.open(file.stream)
+	json_img = request.get_json()
 
 	""" save the image if its not empty """
-	img = np.asarray(img)
-	if img[:, :, 3].mean() != 0:
-		img = Image.fromarray(img)
-		img.save(save_path, IMAGE_PREFIX)
+	if json_img['segments'] and json_img['segments'][-1][-1]['time'] <= MAX_TIME_NEEDED:
+		
+		with open(save_path, 'w') as file:
+			json.dump(json_img, file)
 
 		data_stats.at[user_stats.index[0], img_cls] = count + 1
 		current_count += 1
